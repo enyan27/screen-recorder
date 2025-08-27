@@ -46,3 +46,62 @@ export const DEFAULT_RECORDING_CONFIG = {
   audioBitsPerSecond: 128000,
   videoBitsPerSecond: 2500000,
 };
+
+// TEST
+export const dummyCards = [
+  {
+    id: "1",
+    title: "誕生日おめでとう！🍰",
+    thumbnail: "/assets/samples/thumbnail (1).png",
+    userImg: "/assets/images/jason.png",
+    username: "えにゃん",
+    createdAt: new Date("2025-08-27"),
+    views: 10,
+    visibility: "public",
+    duration: 250
+  },
+  {
+    id: "2",
+    title: "旅行の思い出🌏",
+    thumbnail: "/assets/samples/thumbnail (2).png",
+    userImg: "/assets/images/sarah.png",
+    username: "サラ",
+    createdAt: new Date("2025-07-15"),
+    views: 25,
+    visibility: "private",
+    duration: 180
+  },
+  {
+    id: "3",
+    title: "猫の動画🐱",
+    thumbnail: "/assets/samples/thumbnail (3).png",
+    userImg: "/assets/images/ken.png",
+    username: "ケン",
+    createdAt: new Date("2025-06-10"),
+    views: 40,
+    visibility: "public",
+    duration: 120
+  },
+  {
+    id: "4",
+    title: "料理チャレンジ🍳",
+    thumbnail: "/assets/samples/thumbnail (4).png",
+    userImg: "/assets/images/mei.png",
+    username: "メイ",
+    createdAt: new Date("2025-05-01"),
+    views: 15,
+    visibility: "private",
+    duration: 300
+  },
+  {
+    id: "5",
+    title: "友達とゲーム🎮",
+    thumbnail: "/assets/samples/thumbnail (5).png",
+    userImg: "/assets/images/tom.png",
+    username: "トム",
+    createdAt: new Date("2025-04-20"),
+    views: 50,
+    visibility: "public",
+    duration: 210
+  },
+];

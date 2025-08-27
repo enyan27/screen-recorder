@@ -1,4 +1,6 @@
 import SharedHeader from "@/components/SharedHeader";
+import VideoCard from "@/components/VideoCard";
+import { dummyCards } from "@/constants";
 
 const ProfilePage = async ({ params }: ParamsWithSearch) => {
   const { id } = await params;
@@ -12,6 +14,12 @@ const ProfilePage = async ({ params }: ParamsWithSearch) => {
       />
 
       UserId: {id}
+
+      <section className="video-grid">
+        {dummyCards.map(card => (
+          <VideoCard key={card.id} {...card} />
+        ))}
+      </section>
     </main>
   );
 };
