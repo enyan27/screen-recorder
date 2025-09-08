@@ -3,6 +3,10 @@ import { auth } from "./lib/auth";
 import { headers } from "next/headers";
 
 export async function middleware(request: NextRequest) {
+    // ---- Skip Auth ----
+    if (process.env.NEXT_PUBLIC_BASE_URL?.includes("localhost"))
+        return;
+
     const session = await auth.api.getSession({
         headers: await headers(),
     });
