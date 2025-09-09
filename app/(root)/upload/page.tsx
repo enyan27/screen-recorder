@@ -1,6 +1,7 @@
 "use client";
 
-import { ChangeEvent, FormEvent, use, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import FormField from "@/components/FormField";
 import FileInput from "@/components/FileInput";
@@ -8,46 +9,94 @@ import FileInput from "@/components/FileInput";
 import { MAX_THUMBNAIL_SIZE, MAX_VIDEO_SIZE } from "@/constants";
 
 import { useFileInput } from "@/lib/hooks/useFileInput";
+import { getThumbnailUploadUrl, getVideoUploadUrl, saveVideoDetails } from "@/lib/actions/video";
 
-const UploadPage = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        visibility: "public",
+const uploadFileToBunny = (
+    file: File,
+    uploadUrl: string,
+    accessKey: string
+): Promise<void> =>
+    fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+            "Content-Type": file.type,
+            AccessKey: accessKey,
+        },
+        body: file,
+    }).then((response) => {
+        if (!response.ok) throw new Error(`Upload failed with status ${response.status}`);
     });
 
+const UploadPage = () => {
+    const router = useRouter();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [videoDuration, setVideoDuration] = useState<number | null>(null);
+    const [formData, setFormData] = useState<VideoFormValues>({
+        title: "",
+        description: "",
+        tags: "",
+        visibility: "public",
+    });
     const video = useFileInput(MAX_VIDEO_SIZE);
     const thumbnail = useFileInput(MAX_THUMBNAIL_SIZE);
-    const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (video.duration !== null) {
+            setVideoDuration(video.duration);
+        }
+    }, [video.duration]);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-
         setFormData((prevState) => ({ ...prevState, [name]: value }));
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         setIsSubmitting(true);
-
         try {
             if (!video.file || !thumbnail.file) {
                 setError("Please upload video and thumbnail");
                 return;
             }
-
             if (!formData.title || !formData.description) {
                 setError("Please fill in all the details");
                 return;
             }
 
-            // ---- To-do ----
-            // Upload the video
-            // Upload the thumbnail to DB
-            // Attach thumbnail
+            // 1. Video Upload Url
+            const {
+                videoId,
+                uploadUrl: videoUploadUrl,
+                accessKey: videoAccessKey,
+            } = await getVideoUploadUrl();
+            if (!videoUploadUrl || !videoAccessKey)
+                throw new Error("Failed to get video upload credentials");
+
+            await uploadFileToBunny(video.file, videoUploadUrl, videoAccessKey);
+
+            // 2. Thumbnail Upload Url
+            const {
+                uploadUrl: thumbnailUploadUrl,
+                accessKey: thumbnailAccessKey,
+                cdnUrl: thumbnailCdnUrl,
+            } = await getThumbnailUploadUrl(videoId);
+            if (!thumbnailUploadUrl || !thumbnailCdnUrl || !thumbnailAccessKey)
+                throw new Error("Failed to get thumbnail upload credentials");
+
+            await uploadFileToBunny(thumbnail.file, thumbnailUploadUrl, thumbnailAccessKey);
+
+            // 3. Save video details
+            await saveVideoDetails({
+                videoId,
+                thumbnailUrl: thumbnailCdnUrl,
+                ...formData,
+                duration: videoDuration,
+            });
+
+            router.push(`/video/${videoId}`);
         } catch (error) {
             console.log("Error submitting form:", error);
         } finally {
@@ -58,14 +107,12 @@ const UploadPage = () => {
     return (
         <div className="wrapper-md upload-page">
             <h1>Upload a video</h1>
-
             {error && <div className="error-field">{error}</div>}
 
             <form
                 className="rounded-20 gap-6 w-full flex flex-col shadow-10 px-5 py-7.5"
-                onSubmit={handleSubmit}
+                onSubmit={onSubmit}
             >
-
                 <FormField
                     id="title"
                     label="Title"
@@ -73,7 +120,6 @@ const UploadPage = () => {
                     onChange={handleInputChange}
                     placeholder="Enter a clear and concise video title"
                 />
-
                 <FormField
                     id="description"
                     label="Description"
@@ -94,7 +140,6 @@ const UploadPage = () => {
                     onReset={video.resetFile}
                     type="video"
                 />
-
                 <FileInput
                     id="thumbnail"
                     label="Thumbnail"
@@ -130,6 +175,6 @@ const UploadPage = () => {
             </form>
         </div>
     )
-}
+};
 
 export default UploadPage;
