@@ -2,12 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
+import { authClient } from "@/lib/auth-client";
 
 const Navbar = () => {
     const router = useRouter();
-    const user = {};
+    const { data: session } = authClient.useSession();
+    const user = session?.user;
 
     return (
         <header className="navbar">
@@ -26,14 +28,25 @@ const Navbar = () => {
                     <figure>
                         <button onClick={() => router.push("/profile/12345")}>
                             <Image
-                                src="/assets/images/dummy.jpg"
-                                alt="User"
+                                src={user.image || "/assets/images/dummy.jpg"}
+                                alt="user"
                                 width={36}
                                 height={36}
                                 className="rounded-full aspect-square"
                             />
                         </button>
-                        <button className="cursor-pointer">
+                        <button
+                            onClick={async () => {
+                                return await authClient.signOut({
+                                    fetchOptions: {
+                                        onSuccess: () => {
+                                            redirect("/sign-in");
+                                        },
+                                    },
+                                });
+                            }}
+                            className="cursor-pointer"
+                        >
                             <Image
                                 src="/assets/icons/logout.svg"
                                 alt="logout"

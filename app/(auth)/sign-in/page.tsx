@@ -5,8 +5,8 @@ import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 
 const SignIn = () => {
-    const handleSignIn = async () => {
-        return await authClient.signIn.social({ provider: "google" });
+    const handleSignIn = async (provider: "google" | "github") => {
+        return await authClient.signIn.social({ provider });
     };
 
     return (
@@ -56,7 +56,7 @@ const SignIn = () => {
                 </div>
                 <p>© Screen Recorder {new Date().getFullYear()}</p>
             </aside>
-            <aside className="google-sign-in">
+            <aside className="social-sign-in">
                 <section>
                     <Link href="/">
                         <Image
@@ -72,7 +72,7 @@ const SignIn = () => {
                         time!
                     </p>
 
-                    <button onClick={handleSignIn}>
+                    <button onClick={() => handleSignIn("google")}>
                         <Image
                             src="/assets/icons/google.svg"
                             alt="Google Icon"
@@ -80,6 +80,15 @@ const SignIn = () => {
                             height={22}
                         />
                         <span>Sign in with Google</span>
+                    </button>
+                    <button onClick={() => handleSignIn("github")}>
+                        <Image
+                            src="/assets/icons/github.svg"
+                            alt="GitHub Icon"
+                            width={22}
+                            height={22}
+                        />
+                        <span>Sign in with GitHub</span>
                     </button>
                 </section>
             </aside>
