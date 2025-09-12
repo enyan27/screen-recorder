@@ -112,6 +112,26 @@ export const getOrderByClause = (filter?: string) => {
     }
 };
 
+export function daysAgo(inputDate: Date): string {
+    const input = new Date(inputDate);
+    const now = new Date();
+
+    const diffTime = now.getTime() - input.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 0) {
+        return "Today";
+    } else if (diffDays === 1) {
+        return "1 day ago";
+    } else {
+        return `${diffDays} days ago`;
+    }
+};
+
+export const createIframeLink = (videoId: string) => {
+    return `https://iframe.mediadelivery.net/embed/492420/${videoId}?autoplay=true&preload=true`;
+};
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const doesTitleMatch = (videos: any, searchQuery: string) => {
     return ilike(
