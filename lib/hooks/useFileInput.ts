@@ -10,8 +10,9 @@ export const useFileInput = (maxSize: number) => {
         if (e.target.files?.[0]) {
             const selectedFile = e.target.files[0];
 
-            if (selectedFile.size > maxSize) return;
-
+            if (selectedFile.size > maxSize) {
+                return;
+            }
             if (previewUrl) URL.revokeObjectURL(previewUrl);
 
             setFile(selectedFile);
@@ -31,7 +32,6 @@ export const useFileInput = (maxSize: number) => {
                     }
                     URL.revokeObjectURL(video.src);
                 };
-
                 video.src = objectUrl;
             }
         }
@@ -39,11 +39,9 @@ export const useFileInput = (maxSize: number) => {
 
     const resetFile = () => {
         if (previewUrl) URL.revokeObjectURL(previewUrl);
-
         setFile(null);
         setPreviewUrl(null);
         setDuration(null);
-
         if (inputRef.current) inputRef.current.value = "";
     };
 

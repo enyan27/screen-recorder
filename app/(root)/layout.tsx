@@ -1,12 +1,16 @@
-import Navbar from "@/components/Navbar"
+import { Navbar } from "@/components";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const RootLayout = ({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) => {
     return (
         <div>
             <Navbar />
             {children}
         </div>
-    )
-}
+    );
+};
 
-export default Layout;
+export default RootLayout;

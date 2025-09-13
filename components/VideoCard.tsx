@@ -1,7 +1,8 @@
 "use client";
-
 import Image from "next/image";
+import ImageWithFallback from "./ImageWithFallback";
 import Link from "next/link";
+import { useState } from "react";
 
 const VideoCard = ({
     id,
@@ -14,6 +15,18 @@ const VideoCard = ({
     visibility,
     duration,
 }: VideoCardProps) => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        navigator.clipboard.writeText(`${window.location.origin}/video/${id}`);
+        setCopied(true);
+        setTimeout(() => {
+            setCopied(false);
+        }, 3000);
+    };
+
     return (
         <Link href={`/video/${id}`} className="video-card">
             <Image
@@ -26,8 +39,8 @@ const VideoCard = ({
             <article>
                 <div>
                     <figure>
-                        <Image
-                            src={userImg || "/assets/images/dummy.jpg"}
+                        <ImageWithFallback
+                            src={userImg}
                             width={34}
                             height={34}
                             alt="avatar"
@@ -49,7 +62,7 @@ const VideoCard = ({
                     </aside>
                 </div>
                 <h2>
-                    {title} - {" "}
+                    {title} -{" "}
                     {createdAt.toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "short",
@@ -57,19 +70,18 @@ const VideoCard = ({
                     })}
                 </h2>
             </article>
-            {/* To-do */}
-            <button onClick={() => { }} className="copy-btn">
+            <button onClick={handleCopy} className="copy-btn">
                 <Image
-                    src="/assets/icons/link.svg"
-                    alt="copy link"
+                    src={
+                        copied ? "/assets/icons/checkmark.svg" : "/assets/icons/link.svg"
+                    }
+                    alt="Copy Link"
                     width={18}
                     height={18}
                 />
             </button>
             {duration && (
-                <div className="duration">
-                    {Math.ceil(duration / 60)} min
-                </div>
+                <div className="duration">{Math.ceil(duration / 60)}min</div>
             )}
         </Link>
     );
